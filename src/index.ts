@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
 import authRouter from "./auth/auth.router";
+import { logger, loggerInstance } from "./logger";
 
 type Variables = {
   user?: {
@@ -26,7 +26,15 @@ app.notFound((c) => c.json({ message: "Not Found" }, 404));
 // Handle errors
 app.onError((err, c) => {
   if (Bun.env.NODE_ENV !== "test") {
-    console.error(err);
+    if (Bun.env.NODE_ENV === "development") {
+      console.error(err);
+    } else {
+      loggerInstance.info({
+        type: "error",
+        message: err instanceof Error ? err.message : err,
+        stack: err instanceof Error ? err.stack : undefined,
+      });
+    }
   }
 
   if (err instanceof HTTPException) {

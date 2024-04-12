@@ -9,5 +9,4 @@ bun run dev
 ```
 
 Future improvements:
-- pino logger
 - mock Postgres database with pgMock
